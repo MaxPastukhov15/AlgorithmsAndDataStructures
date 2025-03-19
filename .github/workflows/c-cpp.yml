@@ -30,7 +30,3 @@ jobs:
 
       - name: Run tests
         run: make -C tests test
-
-
-    - name: Run tests
-      run: ./test
