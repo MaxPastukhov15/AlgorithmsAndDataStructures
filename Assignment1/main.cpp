@@ -3,6 +3,8 @@
 #include <string>
 #include <vector>
 #include <filesystem>
+#include "encoder.hpp"  
+#include "decoder.hpp"  
 
 int main() {
     std::string input;
@@ -20,15 +22,39 @@ int main() {
     infile.read(buffer.data(), f_size);
     infile.close();
 
+    short n;
+    std::cout << "Choose encoder(1) or decoder(2): ";	
+    std::cin >> n;
+
+    std::ostringstream output;  
+
+    switch (n) {
+        case 1: {
+            std::istringstream input_stream(std::string(buffer.begin(), buffer.end()));
+            encoder(input_stream, output);
+            break;
+        }
+        case 2: {
+            std::istringstream input_stream(std::string(buffer.begin(), buffer.end()));
+            decoder(input_stream, output);
+            break;
+        }
+        default:
+            std::cerr << "Invalid choice.\n";
+            return 1;
+    }
+
     std::ofstream outfile("new_file.txt", std::ios::binary);
     if (!outfile) {  
         std::cerr << "Problems with writing file\n";
         return 1;
     }
 
-    outfile.write(buffer.data(), f_size);
+    std::string result = output.str();
+    outfile.write(result.data(), result.size());
     outfile.close();
 
+    std::cout << "Operation completed successfully!\n";
     return 0;
 }
 
