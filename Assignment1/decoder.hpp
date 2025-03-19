@@ -10,7 +10,6 @@ void decoder(std::istream& input, std::ostream& output) {
     char ch;
 
     while (input.get(ch)) {
-        
         if (ch == '~' && input.peek() == '>') {
             input.get();
             break;
@@ -23,7 +22,6 @@ void decoder(std::istream& input, std::ostream& output) {
 
         buffer.push_back(ch);
 
-        
         if (buffer.size() == 5) {
             unsigned int value = 0;
             for (char c : buffer) {
@@ -42,11 +40,16 @@ void decoder(std::istream& input, std::ostream& output) {
         }
     }
 
-    // Handle last block (less than 5 characters)
+    
+    if (!buffer.empty() && (buffer.size() < 2 || buffer.size() > 4)) {
+        throw std::runtime_error("Incorrect final block size in ASCII85 encoding");
+    }
+
+   
     if (!buffer.empty()) {
         int num_chars = buffer.size();
         while (buffer.size() < 5) {
-            buffer.push_back('u'); // Padding with 'u' (117)
+            buffer.push_back('u');  
         }
 
         unsigned int value = 0;
@@ -64,5 +67,6 @@ void decoder(std::istream& input, std::ostream& output) {
         output.write(decoded, num_chars - 1);
     }
 }
+
 #endif
 

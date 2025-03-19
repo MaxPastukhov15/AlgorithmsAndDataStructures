@@ -3,58 +3,60 @@
 #include <string>
 #include <vector>
 #include <filesystem>
-#include "encoder.hpp"  
-#include "decoder.hpp"  
+#include "encoder.hpp"
+#include "decoder.hpp"
 
-int main() {
-    std::string input;
-    std::cin >> input;
-
-    std::ifstream infile(input, std::ios::binary);
-    if (!infile) {  
-        std::cerr << "Problems with reading file\n";
+int main(int argc, char* argv[]) {
+    if (argc < 3) {
+        std::cerr << "Usage: " << argv[0] << " encode|decode input_file [output_file|--stdout]\n";
         return 1;
     }
 
-    auto f_size = std::filesystem::file_size(input);
-    std::vector<char> buffer(f_size);  
+    std::string mode = argv[1];
+    std::string input_file = argv[2];
+    std::string output_file = (argc >= 4 && std::string(argv[3]) != "--stdout") ? argv[3] : "";
 
-    infile.read(buffer.data(), f_size);
-    infile.close();
+    bool to_stdout = (argc >= 4 && std::string(argv[3]) == "--stdout");
 
-    short n;
-    std::cout << "Choose encoder(1) or decoder(2): ";	
-    std::cin >> n;
+    std::ifstream infile(input_file, std::ios::binary);
+    if (!infile) {
+        std::cerr << "Error opening input file.\n";
+        return 1;
+    }
 
-    std::ostringstream output;  
-
-    switch (n) {
-        case 1: {
-            std::istringstream input_stream(std::string(buffer.begin(), buffer.end()));
-            encoder(input_stream, output);
-            break;
-        }
-        case 2: {
-            std::istringstream input_stream(std::string(buffer.begin(), buffer.end()));
-            decoder(input_stream, output);
-            break;
-        }
-        default:
-            std::cerr << "Invalid choice.\n";
+    std::ostream* output_stream = &std::cout;
+    std::ofstream outfile;
+    if (!to_stdout) {
+        if (output_file.empty()) output_file = "output.txt";
+        outfile.open(output_file, std::ios::binary);
+        if (!outfile) {
+            std::cerr << "Error opening output file.\n";
             return 1;
+        }
+        output_stream = &outfile;
     }
 
-    std::ofstream outfile("new_file.txt", std::ios::binary);
-    if (!outfile) {  
-        std::cerr << "Problems with writing file\n";
-        return 1;
+    char buffer[1024];
+    while (infile.read(buffer, sizeof(buffer)) || infile.gcount() > 0) {
+        std::string data(buffer, infile.gcount());
+        std::istringstream input_stream(data);
+        std::ostringstream encoded_output;
+
+        if (mode == "encode") {
+            encoder(input_stream, encoded_output);
+        } else if (mode == "decode") {
+            decoder(input_stream, encoded_output);
+        } else {
+            std::cerr << "Invalid mode. Use 'encode' or 'decode'.\n";
+            return 1;
+        }
+
+        *output_stream << encoded_output.str();
     }
 
-    std::string result = output.str();
-    outfile.write(result.data(), result.size());
-    outfile.close();
+    infile.close();
+    if (outfile.is_open()) outfile.close();
 
-    std::cout << "Operation completed successfully!\n";
     return 0;
 }
 
