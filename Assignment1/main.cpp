@@ -6,7 +6,7 @@
 #include "decoder.hpp"
 
 int main(int argc, char* argv[]) {
-    // Проверка аргументов командной строки
+    // Checking command line arguments
     if (argc < 2) {
         std::cerr << "Usage: " << argv[0] << " [-e] [-d]\n";
         std::cerr << "  -e: Encode input to ASCII85 (default)\n";
@@ -14,8 +14,8 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    // Определение режима работы (кодирование или декодирование)
-    std::string mode = "encode"; // По умолчанию кодирование
+    // Determination of the operating mode (encoding or decoding)
+    std::string mode = "encode"; 
     for (int i = 1; i < argc; ++i) {
         std::string arg = argv[i];
         if (arg == "-e") {
@@ -28,7 +28,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    // Чтение из STDIN и запись в STDOUT
+    // Reading from STDIN and writing in STDOUT
     if (mode == "encode") {
         encoder(std::cin, std::cout);
     } else if (mode == "decode") {
@@ -36,7 +36,7 @@ int main(int argc, char* argv[]) {
             decoder(std::cin, std::cout);
         } catch (const std::runtime_error& e) {
             std::cerr << "Decoding error: " << e.what() << "\n";
-            return 1; // Завершение с ошибкой
+            return 1; 
         }
     }
 
