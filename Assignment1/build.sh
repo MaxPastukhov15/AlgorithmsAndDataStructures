@@ -1,27 +1,27 @@
 #!/bin/bash
 
-# Компиляция программы
+# Compilation of the programm
 g++ -o ascii85 main.cpp encoder.hpp decoder.hpp -lgtest -lpthread
 if [ $? -ne 0 ]; then
     echo "Ошибка компиляции"
     exit 1
 fi
 
-# Создание тестового входного файла
+#Creating input file
 echo "Hello, World!" > test_input.txt
 
-# Тестирование кодирования
+# Test of coding
 echo "Тестируем корректные данные..."
 encoded_cpp=$(./ascii85 -e < test_input.txt)
 
-# Кодирование с помощью Python для сравнения
+# Coding in Python for comparison 
 encoded_py=$(python3 ascii.py <<< "Hello, World!")
 
-# Удаляем маркер конца для сравнения
+# Deleting end "~>" for comparison
 encoded_cpp_clean=$(echo "$encoded_cpp" | sed 's/~>$//')
 encoded_py_clean=$(echo "$encoded_py" | sed 's/~>$//')
 
-# Сравнение закодированных данных
+# Comparison of encoded data
 if [ "$encoded_cpp_clean" == "$encoded_py_clean" ]; then
     echo "Кодирование совпадает!"
 else
@@ -31,14 +31,14 @@ else
     exit 1
 fi
 
-# Тестирование декодирования
+# Decoding test
 echo "Тестируем декодирование..."
 decoded_cpp=$(./ascii85 -d <<< "$encoded_cpp")
 
-# Декодирование с помощью Python для сравнения
+# Decoding with Python for comparison
 decoded_py=$(python3 ascii.py <<< "Hello, World!" | awk '{print $3}')
 
-# Сравнение декодированных данных
+# Comparison of decoded data
 if [ "$decoded_cpp" == "$decoded_py" ]; then
     echo "Декодирование совпадает!"
 else
@@ -48,7 +48,7 @@ else
     exit 1
 fi
 
-# Тестирование обработки некорректных данных
+# Test for incorrect data
 echo "Проверяем обработку некорректных данных..."
 echo "!!!invalid_data!!!" > invalid_input.txt
 ./ascii85 -d < invalid_input.txt > /dev/null 2>&1
