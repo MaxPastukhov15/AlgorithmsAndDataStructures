@@ -9,7 +9,7 @@ void encoder(std::istream& input, std::ostream& output) {
         std::streamsize bytes_read = input.gcount();
         int padding = 4 - bytes_read;
 
-        // Если данных меньше 4 байт, дополняем нулями
+        //If the data is less than 4 bytes, add zeros.
         for (int i = bytes_read; i < 4; ++i) {
             buffer[i] = 0;
         }
@@ -20,18 +20,18 @@ void encoder(std::istream& input, std::ostream& output) {
                       static_cast<unsigned char>(buffer[3]));
 
 
-        // Кодируем 32-битное число в 5 символов ASCII85
+        // Encoding a 32-bit number into 5 ASCII85 characters
         char encode[5];
         for (int i = 4; i >= 0; --i) {
             encode[i] = value % 85 + 33;
             value /= 85;
         }
 
-        // Записываем закодированные символы, исключая padding
+        // We write down the encoded characters, excluding padding
         output.write(encode, 5 - padding);
     }
 
-    // Записываем маркер конца
+    // Writing down the end marker
     output << "~>";
 }
 
