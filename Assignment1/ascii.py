@@ -1,9 +1,7 @@
 import base64
+import sys
 
-d = input()
+information = sys.stdin.read().strip()
 
-encoder = base64.a85encode(d.encode())  
-decode = base64.a85decode(encoder)  
-
-print(d, encoder, decode.decode())  
-
+encoder = base64.a85encode(information.encode(), adobe=False)
+print(encoder.decode() + "~>")

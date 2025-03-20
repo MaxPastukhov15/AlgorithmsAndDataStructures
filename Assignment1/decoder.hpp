@@ -2,32 +2,34 @@
 #define DECODER_HPP
 
 #include <iostream>
-#include <vector>
 #include <stdexcept>
 
 void decoder(std::istream& input, std::ostream& output) {
-    std::vector<char> buffer;
-    char ch;
+    char buffer[5];
+    int count = 0;
 
-    while (input.get(ch)) {
-        if (ch == '~' && input.peek() == '>') {
-            input.get();
+    while (input.get(buffer[count])) {
+        // Проверяем маркер конца "~>"
+        if (buffer[count] == '~' && input.peek() == '>') {
+            input.get(); // Пропускаем '>'
             break;
         }
 
-       
-        if (ch < 33 || ch > 117) {
+        // Проверяем корректность символа
+        if (buffer[count] < 33 || buffer[count] > 117) {
             throw std::runtime_error("Invalid character in ASCII85 encoding");
         }
 
-        buffer.push_back(ch);
+        count++;
 
-        if (buffer.size() == 5) {
+        // Если накопилось 5 символов, декодируем их
+        if (count == 5) {
             unsigned int value = 0;
-            for (char c : buffer) {
-                value = value * 85 + (c - 33);
+            for (int i = 0; i < 5; ++i) {
+                value = value * 85 + (buffer[i] - 33);
             }
 
+            // Преобразуем 32-битное число в 4 байта
             char decoded[4] = {
                 static_cast<char>((value >> 24) & 0xFF),
                 static_cast<char>((value >> 16) & 0xFF),
@@ -35,28 +37,29 @@ void decoder(std::istream& input, std::ostream& output) {
                 static_cast<char>(value & 0xFF)
             };
 
+            // Записываем декодированные байты
             output.write(decoded, 4);
-            buffer.clear();
+            count = 0;
         }
     }
 
-    
-    if (!buffer.empty() && (buffer.size() < 2 || buffer.size() > 4)) {
-        throw std::runtime_error("Incorrect final block size in ASCII85 encoding");
-    }
+    // Обработка последнего блока (если он есть)
+    if (count > 0) {
+        if (count < 2 || count > 4) {
+            throw std::runtime_error("Incorrect final block size in ASCII85 encoding");
+        }
 
-   
-    if (!buffer.empty()) {
-        int num_chars = buffer.size();
-        while (buffer.size() < 5) {
-            buffer.push_back('u');  
+        // Дополняем последний блок до 5 символов
+        for (int i = count; i < 5; ++i) {
+            buffer[i] = 'u'; // 'u' соответствует 117 в ASCII
         }
 
         unsigned int value = 0;
-        for (char c : buffer) {
-            value = value * 85 + (c - 33);
+        for (int i = 0; i < 5; ++i) {
+            value = value * 85 + (buffer[i] - 33);
         }
 
+        // Преобразуем 32-битное число в байты
         char decoded[4] = {
             static_cast<char>((value >> 24) & 0xFF),
             static_cast<char>((value >> 16) & 0xFF),
@@ -64,9 +67,9 @@ void decoder(std::istream& input, std::ostream& output) {
             static_cast<char>(value & 0xFF)
         };
 
-        output.write(decoded, num_chars - 1);
+        // Записываем декодированные байты, исключая padding
+        output.write(decoded, count - 1);
     }
 }
 
 #endif
-
