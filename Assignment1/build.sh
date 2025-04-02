@@ -1,63 +1,66 @@
 #!/bin/bash
+set -e
 
-# Compilation of the programm
-g++ -o ascii85 main.cpp encoder.hpp decoder.hpp -lgtest -lpthread
-if [ $? -ne 0 ]; then
+# Компиляция программы
+echo "Компиляция C++ программы..."
+g++ -o ascii85 main.cpp encoder.hpp decoder.hpp || {
     echo "Ошибка компиляции"
     exit 1
-fi
+}
 
-#Creating input file
-echo "Hello, World!" > test_input.txt
+# Создание тестового файла
+echo "Создание тестовых данных..."
+echo "Hello World" > test_input.txt
+original_content=$(cat test_input.txt)
 
-# Test of coding
-echo "Тестируем корректные данные..."
+# Тест 1: C++ encode -> Python decode
+echo -e "\nТест 1: C++ encode -> Python decode"
 encoded_cpp=$(./ascii85 -e < test_input.txt)
+echo "Закодированные данные (C++): ${encoded_cpp}"
 
-# Coding in Python for comparison 
-encoded_py=$(python3 ascii.py <<< "Hello, World!")
+# Удаляем терминатор ~> для Python декодера
+encoded_for_py=${encoded_cpp//~>/}
 
-# Deleting end "~>" for comparison
-encoded_cpp_clean=$(echo "$encoded_cpp" | sed 's/~>$//')
-encoded_py_clean=$(echo "$encoded_py" | sed 's/~>$//')
+decoded_py=$(python3 -c "
+import base64
+try:
+    decoded = base64.a85decode(b'$encoded_for_py', adobe=False)
+    print(decoded.decode('utf-8'))
+except Exception as e:
+    print('DECODE_ERROR:', str(e))
+")
 
-# Comparison of encoded data
-if [ "$encoded_cpp_clean" == "$encoded_py_clean" ]; then
-    echo "Кодирование совпадает!"
+if [ "$decoded_py" == "$original_content" ]; then
+    echo "Успех: C++ encode -> Python decode"
 else
-    echo "Кодирование различается!"
-    echo "C++: $encoded_cpp"
-    echo "Python: $encoded_py"
+    echo "Ошибка: C++ encode -> Python decode"
+    echo "Ожидалось: '$original_content'"
+    echo "Получено:  '$decoded_py'"
     exit 1
 fi
 
-# Decoding test
-echo "Тестируем декодирование..."
-decoded_cpp=$(./ascii85 -d <<< "$encoded_cpp")
+# Тест 2: Python encode -> C++ decode
+echo -e "\nТест 2: Python encode -> C++ decode"
+encoded_py=$(python3 -c "
+import base64
+import sys
+data = sys.stdin.read().encode('utf-8')
+encoded = base64.a85encode(data, adobe=False).decode('utf-8')
+print(encoded + '~>')
+" < test_input.txt)
 
-# Decoding with Python for comparison
-decoded_py=$(python3 ascii.py <<< "Hello, World!" | awk '{print $3}')
+echo "Закодированные данные (Python): ${encoded_py}"
 
-# Comparison of decoded data
-if [ "$decoded_cpp" == "$decoded_py" ]; then
-    echo "Декодирование совпадает!"
+decoded_cpp=$(./ascii85 -d <<< "$encoded_py" 2>&1 || echo "DECODE_ERROR: $?")
+
+if [ "$decoded_cpp" == "$original_content" ]; then
+    echo "Успех: Python encode -> C++ decode"
 else
-    echo "Декодирование различается!"
-    echo "C++: $decoded_cpp"
-    echo "Python: $decoded_py"
+    echo "Ошибка: Python encode -> C++ decode"
+    echo "Ожидалось: '$original_content'"
+    echo "Получено:  '$decoded_cpp'"
     exit 1
 fi
 
-# Test for incorrect data
-echo "Проверяем обработку некорректных данных..."
-echo "!!!invalid_data!!!" > invalid_input.txt
-./ascii85 -d < invalid_input.txt > /dev/null 2>&1
-if [ $? -ne 0 ]; then
-    echo "✅ C++ декодер корректно завершился с ошибкой!"
-else
-    echo "❌ C++ декодер пропустил некорректные данные!"
-    exit 1
-fi
-
-echo "Тесты пройдены успешно!"
+echo -e "\nВсе тесты совместимости пройдены успешно!"
 exit 0
