@@ -25,24 +25,7 @@ jobs:
           cmake --build build
           sudo cmake --install build
 
-      - name: Debug file structure
-        run: ls -R
-
-      - name: Build project
+      - name: Build and run tests
         run: |
-          if [ -d "tests" ]; then
-            make -C tests
-          elif [ -d "Assignment 1/tests" ]; then
-            make -C "Assignment 1/tests"
-          else
-            echo "::error::Tests directory not found!"
-            exit 1
-          fi
-
-      - name: Run tests
-        run: |
-          if [ -d "tests" ]; then
-            make -C tests test
-          elif [ -d "Assignment 1/tests" ]; then
-            make -C "Assignment 1/tests" test
-          fi
+          make -C Assignment1  # Сборка
+          make -C Assignment1 test  # Запуск тестов (если есть такая цель в Makefile)
