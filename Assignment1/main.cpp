@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+
 #include "encoder.hpp"
 #include "decoder.hpp"
 
@@ -39,6 +40,7 @@ int main(int argc, char* argv[]) {
             return 1; 
         }
     }
+
 
     return 0;
 }

@@ -20,6 +20,7 @@ void encoder(std::istream& input, std::ostream& output) {
                       static_cast<unsigned char>(buffer[3]));
 
 
+
         // Encoding a 32-bit number into 5 ASCII85 characters
         char encode[5];
         for (int i = 4; i >= 0; --i) {
@@ -28,6 +29,7 @@ void encoder(std::istream& input, std::ostream& output) {
         }
 
         // We write down the encoded characters, excluding padding
+
         output.write(encode, 5 - padding);
     }
 
@@ -36,3 +38,4 @@ void encoder(std::istream& input, std::ostream& output) {
 }
 
 #endif
+

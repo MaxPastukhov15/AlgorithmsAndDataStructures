@@ -12,6 +12,7 @@ void decoder(std::istream& input, std::ostream& output) {
         //Checking end "~>"
         if (buffer[count] == '~' && input.peek() == '>') {
             input.get(); // Пропускаем '>'
+
             break;
         }
 
@@ -24,6 +25,7 @@ void decoder(std::istream& input, std::ostream& output) {
 
         // If there are 5 symboles , we will decode them
         if (count == 5) {
+
             unsigned int value = 0;
             for (int i = 0; i < 5; ++i) {
                 value = value * 85 + (buffer[i] - 33);
@@ -52,6 +54,7 @@ void decoder(std::istream& input, std::ostream& output) {
         // Complete last block to 5 symbols
         for (int i = count; i < 5; ++i) {
             buffer[i] = 'u'; // 'u' соответствует 117 в ASCII
+
         }
 
         unsigned int value = 0;
@@ -71,5 +74,6 @@ void decoder(std::istream& input, std::ostream& output) {
         output.write(decoded, count - 1);
     }
 }
+
 
 #endif
