@@ -1,0 +1,3 @@
+[submodule "Assignment2/externals/lazycsv"]
+	path = Assignment2/externals/lazycsv
+	url = https://github.com/ashtum/lazycsv.git

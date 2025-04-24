@@ -2,55 +2,84 @@
 #include <Eigen/Dense>
 #include "Gauss.hpp"
 
+using namespace Eigen;
+using namespace LinearSolver;
+
 namespace LinearSolverTest {
 
 class GaussSolverTest : public ::testing::Test {
 protected:
     void SetUp() override {
-        // Простая 2x2 система
+        // Simple 2x2 system
         A2 << 2, -1,
-             -1, 2;
+              -1, 2;
         b2 << 0, 3;
-        expected2 << 1, 2;
+        expected2 = A2.colPivHouseholderQr().solve(b2);
 
-        // Простая 3x3 система
+        // Simple 3x3 system
         A3 << 1, 2, -1,
               2, 1, -2,
-              -3, 1, 1;
+             -3, 1, 1;
         b3 << 3, 3, -6;
-        expected3 << 1, 2, 3;
+        expected3 = A3.colPivHouseholderQr().solve(b3);
 
-        // Вырожденная матрица
+        // Another 3x3 system
+        A4 << 2, 1, -1,
+             -3, -1, 2,
+             -2, 1, 2;
+        b4 << 8, -11, -3;
+        expected4 = A4.colPivHouseholderQr().solve(b4);
+
+        // Singular matrix (dependent rows)
         singularA << 1, 2, 3,
-                     4, 5, 6,
-                     7, 8, 9;
+                     2, 4, 6,
+                     3, 6, 9;
         singularB << 1, 2, 3;
     }
 
     Matrix2d A2;
-    Vector2d b2;
-    Vector2d expected2;
+    Vector2d b2, expected2;
 
-    Matrix3d A3;
-    Vector3d b3;
-    Vector3d expected3;
-
-    Matrix3d singularA;
-    Vector3d singularB;
+    Matrix3d A3, A4, singularA;
+    Vector3d b3, b4, singularB;
+    Vector3d expected3, expected4;
 };
 
 TEST_F(GaussSolverTest, SolvesSimple2x2System) {
-    Vector2d result = LinearSolver::solveGauss(A2, b2);
+    Vector2d result = solveGauss(A2, b2);
     ASSERT_TRUE(result.isApprox(expected2, 1e-6));
 }
 
 TEST_F(GaussSolverTest, SolvesSimple3x3System) {
-    Vector3d result = LinearSolver::solveGauss(A3, b3);
+    Vector3d result = solveGauss(A3, b3);
     ASSERT_TRUE(result.isApprox(expected3, 1e-6));
 }
 
 TEST_F(GaussSolverTest, ThrowsForSingularMatrix) {
-    EXPECT_THROW(LinearSolver::solveGauss(singularA, singularB), std::runtime_error);
+    EXPECT_THROW({
+        solveGauss(singularA, singularB);
+    }, std::runtime_error);
 }
 
+TEST_F(GaussSolverTest, SolvesAnother3x3System) {
+    Vector3d result = solveGauss(A4, b4);
+    ASSERT_TRUE(result.isApprox(expected4, 1e-6));
+}
+
+// test CSV reading
+
+TEST_F(GaussSolverTest, SolvesFromCSV) {
+    MatrixXd A = readMatrixFromCSV("dataA.csv");
+    MatrixXd bmat = readMatrixFromCSV("datab.csv");
+    VectorXd b = bmat.col(0);
+
+    VectorXd expected = A.colPivHouseholderQr().solve(b);
+    VectorXd result = solveGauss(A, b);
+
+    ASSERT_TRUE(result.isApprox(expected, 1e-6));
+}
+
+
+
 } 
+
