@@ -23,10 +23,9 @@ jobs:
           cd googletest
           cmake -S . -B build
           cmake --build build
-          sudo cmake --install build  # Installs gtest globally
+          sudo cmake --install build
 
-      - name: Build project
-        run: make -C tests  
-
-      - name: Run tests
-        run: make -C tests test
+      - name: Build and run tests
+        run: |
+          make -C Assignment1  # Сборка
+          make -C Assignment1 test  # Запуск тестов (если есть такая цель в Makefile)
