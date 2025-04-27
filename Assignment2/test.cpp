@@ -67,19 +67,19 @@ TEST_F(GaussSolverTest, SolvesAnother3x3System) {
 }
 
 // test CSV reading
-
 TEST_F(GaussSolverTest, SolvesFromCSV) {
     MatrixXd A = readMatrixFromCSV("dataA.csv");
-    MatrixXd bmat = readMatrixFromCSV("datab.csv");
-    VectorXd b = bmat.col(0);
+    VectorXd b = readVectorFromCSV("datab.csv");  
+    if (A.rows() != b.size()) {
+        FAIL() << "Matrix A has " << A.rows() << " rows but vector b has " << b.size() << " elements";
+    }
 
-    VectorXd expected = A.colPivHouseholderQr().solve(b);
+    VectorXd expected(3);
+    expected << 2, 3, -1;
     VectorXd result = solveGauss(A, b);
 
     ASSERT_TRUE(result.isApprox(expected, 1e-6));
 }
-
-
 
 } 
 

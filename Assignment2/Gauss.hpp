@@ -29,34 +29,74 @@ MatrixXd generateRandomMatrix(int rows, int cols, double min = -10.0, double max
 }
 
 MatrixXd readMatrixFromCSV(const std::string& filename) {
-    lazycsv::parser<> csv(filename);
-    
     // First pass to count rows and columns
+    lazycsv::parser<> csv(filename);
     size_t rows = 0, cols = 0;
     for (const auto& row : csv) {
+        size_t current_cols = 0;
+        for (const auto& cell : row) {
+            (void)cell;
+            current_cols++;
+        }
         if (rows == 0) {
-            for (const auto& cell : row) {
-                (void)cell; // unused variable
-                cols++;
-            }
+            cols = current_cols;
         }
         rows++;
     }
-    
+
+    // Log the number of rows and columns
+    std::cout << "CSV file has " << rows << " rows and " << cols << " columns." << std::endl;
+
     MatrixXd matrix(rows, cols);
-    
+
+    // Reinitialize the parser for the second pass
+    lazycsv::parser<> csv_second_pass(filename);
+
     // Second pass to fill the matrix
     size_t i = 0;
-    for (const auto& row : csv) {
+    for (const auto& row : csv_second_pass) {
         size_t j = 0;
         for (const auto& cell : row) {
-            matrix(i, j) = std::stod(cell.unescaped());
+            std::string value = cell.unescaped();
+            std::cout << "Parsing value: '" << value << "' at row " << i << ", col " << j << std::endl;
+            value.erase(std::remove_if(value.begin(), value.end(), ::isspace), value.end());
+            if (value.empty()) {
+                throw std::runtime_error("Empty value encountered");
+            }
+            matrix(i, j) = std::stod(value);
             j++;
         }
         i++;
     }
-    
     return matrix;
+}
+
+
+
+
+
+VectorXd readVectorFromCSV(const std::string& filename) {
+    std::ifstream file(filename);
+    if (!file.is_open()) {
+        throw std::runtime_error("Could not open file: " + filename);
+    }
+
+    std::vector<double> values;
+    std::string line;
+    
+    while (std::getline(file, line)) {
+        // Trim whitespace
+        line.erase(std::remove_if(line.begin(), line.end(), ::isspace), line.end());
+        if (!line.empty()) {
+            try {
+                values.push_back(std::stod(line));
+            } catch (const std::exception& e) {
+                throw std::runtime_error("Error parsing value '" + line + "': " + e.what());
+            }
+        }
+    }
+
+    return Eigen::Map<VectorXd>(values.data(), values.size());
 }
 
 VectorXd solveGauss(const MatrixXd& A, const VectorXd& b) {
