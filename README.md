@@ -1,14 +1,18 @@
-# Decoder and encoder for ASCII_85
+# Gauss solver for matrices
 ## Author
 Pastukhov Maksim Germanovich, группа 24.Б82-мм
 ## Contacts
 st131119@student.spbu.ru
 ## Description 
-  To run decoder and encoder you can go to makefile and change test.cpp to main.cpp 
-  There are some differences in decoding and encoding on python and c++ (example: last chunk +T-python; +US-C++)
+  It has everything for requirements :
+  1.generator of matrices
+  2.tests
+  3.gauss solver
+  4. reading form csv files (using lazycsv)
+  5. writing to csv
 ## Run
- chmod +x build.sh
- ./build.sh
+ make
+ ./eigen_app
   
 
 
