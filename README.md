@@ -4,7 +4,7 @@ Pastukhov Maksim Germanovich, группа 24.Б82-мм
 ## Contacts
 st131119@student.spbu.ru
 ## Description 
-  It has everything for requirements :
+  ##It has everything for requirements :
   1.generator of matrices
   2.tests
   3.gauss solver
