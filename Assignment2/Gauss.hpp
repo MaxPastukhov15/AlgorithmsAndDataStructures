@@ -1,106 +1,77 @@
-#ifndef GAUSS_HPP
-#define GAUSS_HPP 
+#pragma once
 
 #include <iostream>
 #include <vector>
 #include <string>
 #include <fstream>
 #include <random>
+#include <utility>
 #include <Eigen/Dense>
 #include "lazycsv.hpp"
 
 
 using namespace Eigen;
 
-namespace LinearSolver {
+namespace linearsolver {
 
-MatrixXd generateRandomMatrix(int rows, int cols, double min = -10.0, double max = 10.0) {
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_real_distribution<> dis(min, max);
-
-    MatrixXd matrix(rows, cols);
-    for (int i = 0; i < rows; ++i) {
-        for (int j = 0; j < cols; ++j) {
-            matrix(i, j) = dis(gen);
-        }
-    }
-    return matrix;
-}
-
-MatrixXd readMatrixFromCSV(const std::string& filename) {
-    // First pass to count rows and columns
-    lazycsv::parser<> csv(filename);
+std::pair<size_t,size_t> Msize(const std::string& filename){
     size_t rows = 0, cols = 0;
+   
+    lazycsv::parser csv(filename);
     for (const auto& row : csv) {
-        size_t current_cols = 0;
-        for (const auto& cell : row) {
+       size_t current_cols = 0;
+       for (const auto& cell : row) {
             (void)cell;
             current_cols++;
-        }
-        if (rows == 0) {
+       }
+       if (rows == 0) {
             cols = current_cols;
-        }
-        rows++;
+       }
+       rows++;
     }
+    return {rows, cols};
+}
 
-    // Log the number of rows and columns
-    std::cout << "CSV file has " << rows << " rows and " << cols << " columns." << std::endl;
 
-    MatrixXd matrix(rows, cols);
+MatrixXd readMatrixVectorFromCSV(const std::string& filename) {
+    
+    std::pair<size_t,size_t> matrix_vector_size = Msize(filename);
+    size_t rows = matrix_vector_size.first;
+    size_t cols = matrix_vector_size.second; 
+   
+    MatrixXd matrix_vector(rows, cols);
+   
+    
+    lazycsv::parser csv(filename);
 
-    // Reinitialize the parser for the second pass
-    lazycsv::parser<> csv_second_pass(filename);
-
-    // Second pass to fill the matrix
-    size_t i = 0;
-    for (const auto& row : csv_second_pass) {
+    size_t i = 0, j = 0;
+    auto header = csv.header();
+    for (const auto& cell : header){
+    	std::string value = cell.unescaped();
+    	if (value.empty()) throw std::runtime_error("Empty value encountered");
+        matrix_vector(i, j) = std::stod(value);
+        ++j;
+    }
+    ++i;
+    
+    for (const auto& row : csv) {
         size_t j = 0;
+        if (i >= rows) break; 
         for (const auto& cell : row) {
             std::string value = cell.unescaped();
-            std::cout << "Parsing value: '" << value << "' at row " << i << ", col " << j << std::endl;
-            value.erase(std::remove_if(value.begin(), value.end(), ::isspace), value.end());
-            if (value.empty()) {
-                throw std::runtime_error("Empty value encountered");
-            }
-            matrix(i, j) = std::stod(value);
-            j++;
+            if (value.empty()) throw std::runtime_error("Empty value encountered");
+            
+            matrix_vector(i, j) = std::stod(value);
+            ++j;
         }
-        i++;
+        ++i;
     }
-    return matrix;
+    return matrix_vector;
 }
 
 
-
-
-
-VectorXd readVectorFromCSV(const std::string& filename) {
-    std::ifstream file(filename);
-    if (!file.is_open()) {
-        throw std::runtime_error("Could not open file: " + filename);
-    }
-
-    std::vector<double> values;
-    std::string line;
-    
-    while (std::getline(file, line)) {
-        // Trim whitespace
-        line.erase(std::remove_if(line.begin(), line.end(), ::isspace), line.end());
-        if (!line.empty()) {
-            try {
-                values.push_back(std::stod(line));
-            } catch (const std::exception& e) {
-                throw std::runtime_error("Error parsing value '" + line + "': " + e.what());
-            }
-        }
-    }
-
-    return Eigen::Map<VectorXd>(values.data(), values.size());
-}
-
-VectorXd solveGauss(const MatrixXd& A, const VectorXd& b) {
-    if (A.rows() != A.cols() || A.rows() != b.size()) {
+MatrixXd solveGauss(const MatrixXd& A, const MatrixXd& b) {
+    if (A.rows() != A.cols() || A.rows() != b.rows() || b.cols() != 1 ) {
         throw std::invalid_argument("Matrix dimensions are not compatible");
     }
     
@@ -124,14 +95,15 @@ VectorXd solveGauss(const MatrixXd& A, const VectorXd& b) {
         }
         
         // Check for singularity
-        if (std::abs(Ab(i, i)) < 1e-10) {
+        FullPivLU<MatrixXd> lu(A);
+	if (lu.rank() < A.rows()) {
             throw std::runtime_error("Matrix is singular or nearly singular");
         }
         
         // Eliminate elements below current pivot
         for (int k = i + 1; k < n; ++k) {
             double factor = Ab(k, i) / Ab(i, i);
-            Ab(k, i) = 0; // Explicitly set to zero
+            Ab(k, i) = 0; 
             for (int j = i + 1; j < n + 1; ++j) {
                 Ab(k, j) -= Ab(i, j) * factor;
             }
@@ -139,30 +111,49 @@ VectorXd solveGauss(const MatrixXd& A, const VectorXd& b) {
     }
     
     // Back substitution
-    VectorXd x(n);
+    
+    MatrixXd x(n,1);
     for (int i = n - 1; i >= 0; --i) {
-        x(i) = Ab(i, n);
+        x(i,0) = Ab(i, n);
         for (int j = i + 1; j < n; ++j) {
-            x(i) -= Ab(i, j) * x(j);
+            x(i,0) -= Ab(i, j) * x(j,0);
         }
-        x(i) /= Ab(i, i);
+        x(i,0) /= Ab(i, i);
     }
     
     return x;
 }
 
-void writeVectorToCSV(const VectorXd& x, const std::string& filename) {
+
+void writeVectorMatrixToCSV(const MatrixXd& x, const std::string& filename) {
     std::ofstream out(filename);
     if (!out.is_open()) throw std::runtime_error("Cannot open file for writing");
-    
-    for (int i = 0; i < x.size(); ++i) {
-        out << x(i);
-        if (i != x.size() - 1) out << ",";
+    for (int i = 0; i < x.rows(); ++i) {
+    	for (int j = 0; j < x.cols(); ++j){
+        	out << x(i,j);
+        	if (j != x.cols()-1) out << ",";
+        }
+        out << "\n";
     }
-    out << "\n";
+   
     
     out.close();
 }
 
-} 
-#endif
+
+void generateRandomMatrix(int rows, int cols, double min, double max, const std::string& filename) {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<> dis(min, max);
+
+    MatrixXd matrix(rows, cols);
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
+            matrix(i, j) = dis(gen);
+        }
+    }
+    writeVectorMatrixToCSV(matrix,filename);
+}
+
+} //namespace linearsolver 
+

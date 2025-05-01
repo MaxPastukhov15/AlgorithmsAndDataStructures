@@ -1,46 +1,32 @@
 #include "Gauss.hpp"
 #include <iostream>
 
-int main(int argc, char* argv[]) {
-    if (argc != 4) {
-        std::cerr << "Usage: " << argv[0] << " <matrix_csv> <vector_file> <output_csv>\n";
-        std::cerr << "  matrix_csv: CSV file with comma-separated values\n";
-        std::cerr << "  vector_file: File with one value per line\n";
-        return 1;
-    }
+using namespace linearsolver;
+
+int main() {
     
-    try {
-        // Read matrix (proper CSV format)
-        MatrixXd A = LinearSolver::readMatrixFromCSV(argv[1]);
-        
-        // Read vector (one value per line format)
-        VectorXd b = LinearSolver::readVectorFromCSV(argv[2]);
-        
-        // Verify dimensions
-        if (A.rows() != A.cols()) {
-            std::cerr << "Error: Matrix must be square (has " << A.rows() 
-                      << " rows and " << A.cols() << " columns)\n";
-            return 1;
-        }
-        
-        if (A.rows() != b.size()) {
-            std::cerr << "Error: Matrix has " << A.rows() << " rows but vector has " 
-                      << b.size() << " elements\n";
-            return 1;
-        }
-        
-        // Solve system
-        VectorXd solution = LinearSolver::solveGauss(A, b);
-        
-        // Write output
-        LinearSolver::writeVectorToCSV(solution, argv[3]);
-        
-        std::cout << "Solution successfully written to " << argv[3] << "\n";
+    std::string /*file1,*/file2/*,ans*/;
+    
+    //std::cout << "Write name of file with matrix\n";
+    //std::cin >> file1;
+    std::cout << "\nWrite name of file with vector\n";
+    std::cin >> file2;
+    
+    //MatrixXd A = readMatrixVectorFromCSV(file1);
+    MatrixXd b = readMatrixVectorFromCSV(file2);
+    
+    /*for (int i = 0; i < 3; ++i){
+    	for (int j = 0; j < 3; ++j) std::cout << A(i,j) << " ";
+    	std::cout << '\n';
     }
-    catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() << "\n";
-        return 1;
-    }
+    */
+    for (int i = 0; i < 3; ++i) std::cout << b(i,1) << '\n';
+    //MatrixXd res = solveGauss(A,b);
+    
+    //std::cout << "Write name of result file\n";
+   // std::cin >> ans;
+    
+    //writeVectorMatrixToCSV(res,ans);    
     
     return 0;
 }

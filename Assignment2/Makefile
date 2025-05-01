@@ -27,7 +27,7 @@ $(TEST_TARGET): $(TEST_OBJS)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 run: $(TARGET)
-	./$(TARGET) input.csv output.csv
+	./$(TARGET) 
 
 test: $(TEST_TARGET)
 	./$(TEST_TARGET)
