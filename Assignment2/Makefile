@@ -1,5 +1,4 @@
 # Compiler settings
-# Compiler settings
 CXX = g++
 CXXFLAGS = -std=c++17 -g -Wall -Werror -Wpedantic -I/usr/include/eigen3 -Iexternals/lazycsv/include
 LDFLAGS = -lgtest -lgtest_main -lpthread

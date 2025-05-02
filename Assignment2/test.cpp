@@ -31,7 +31,6 @@ protected:
 };
 
 // Full cycle test (read-solve-write)
-// Full cycle test (read-solve-write) with file content verification
 TEST_F(GaussSolverTest, CompleteWorkflow) {
     // Setup test files
     const std::string matrix_file = "test_A.csv";

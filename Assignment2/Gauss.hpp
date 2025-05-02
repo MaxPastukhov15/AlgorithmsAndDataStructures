@@ -17,7 +17,7 @@ namespace linearsolver {
 std::pair<size_t,size_t> Msize(const std::string& filename){
     size_t rows = 0, cols = 0;
    
-    lazycsv::parser csv(filename);
+    lazycsv::parser<lazycsv::mmap_source,lazycsv::has_header<false>> csv(filename);
     for (const auto& row : csv) {
        size_t current_cols = 0;
        for (const auto& cell : row) {
@@ -36,24 +36,16 @@ std::pair<size_t,size_t> Msize(const std::string& filename){
 MatrixXd readMatrixVectorFromCSV(const std::string& filename) {
     
     std::pair<size_t,size_t> matrix_vector_size = Msize(filename);
+  
     size_t rows = matrix_vector_size.first;
     size_t cols = matrix_vector_size.second; 
-   
+
     MatrixXd matrix_vector(rows, cols);
    
     
-    lazycsv::parser csv(filename);
+    lazycsv::parser<lazycsv::mmap_source,lazycsv::has_header<false>> csv(filename);
 
-    size_t i = 0, j = 0;
-    auto header = csv.header();
-    for (const auto& cell : header){
-    	std::string value = cell.unescaped();
-    	if (value.empty()) throw std::runtime_error("Empty value encountered");
-        matrix_vector(i, j) = std::stod(value);
-        ++j;
-    }
-    ++i;
-    
+    size_t i = 0;
     for (const auto& row : csv) {
         size_t j = 0;
         if (i >= rows) break; 
