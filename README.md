@@ -16,6 +16,9 @@ st131119@student.spbu.ru
   4. reading form csv files (using lazycsv)
   
   5. writing to csv
+  Also be careful 
+  do not use enter when you add the csv file, 
+  because this way you create an additional line that may cause you to encounter an exception empty value.
 ## Run
  make
  ./eigen_app
