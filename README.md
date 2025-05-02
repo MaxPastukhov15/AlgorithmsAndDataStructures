@@ -1,3 +1,4 @@
+[![C/C++ CI](https://github.com/MaxPastukhov15/AlgorithmsAndDataStructures/actions/workflows/c-cpp.yml/badge.svg)](https://github.com/MaxPastukhov15/AlgorithmsAndDataStructures/actions/workflows/c-cpp.yml)
 # Gauss solver for matrices
 ## Author
 Pastukhov Maksim Germanovich, группа 24.Б82-мм
