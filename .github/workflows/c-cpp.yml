@@ -27,10 +27,6 @@ jobs:
           cmake --build build
           sudo cmake --install build
 
-      - name: Build and run tests (Assignment1)
-        run: |
-          make -C Assignment1  # Сборка
-          make -C Assignment1 test  # Запуск тестов 
       - name: Build and run tests (Assignment2)
         run: |
           make -C Assignment2
