@@ -9,10 +9,10 @@ TARGET = cd_shannon
 TEST_TARGET = shannon_test
 
 # Source files
-MAIN_SRCS = Shannon.cpp main.cpp
+MAIN_SRCS = main.cpp
 MAIN_OBJS = $(MAIN_SRCS:.cpp=.o)
 
-TEST_SRCS = Shannon.cpp test.cpp
+TEST_SRCS = test.cpp
 TEST_OBJS = $(TEST_SRCS:.cpp=.o)
 
 all: $(TARGET) $(TEST_TARGET)
