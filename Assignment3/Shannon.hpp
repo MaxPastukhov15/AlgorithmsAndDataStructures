@@ -20,8 +20,7 @@ struct Node{
 		
 	Node(char ch, double pr) : character(ch), probability(pr), left(nullptr), right(nullptr) {}
 };
-
-// for encoding 
+ 
 struct CompareNodes{
 	bool operator()(Node* lhs, Node* rhs){
 		return lhs->probability > rhs->probability;
@@ -30,10 +29,10 @@ struct CompareNodes{
 
 void BuildTree(std::vector<std::unique_ptr<Node>>& nodes){
 	std::priority_queue<Node*,std::vector<Node*>,CompareNodes> min_heap;
-	for (auto node : nodes) min_heap.push(node);
+	for (auto& node : nodes) min_heap.push(node.get());
 	
 	while(min_heap.size() > 1){
-		Node* left = min_heap.top(); minHeap.pop();
+		Node* left = min_heap.top(); min_heap.pop();
 		Node* right = min_heap.top(); min_heap.pop();
 		
 		Node* internal_node = std::make_unique<Node>('\0', left->probability + right->probability); 
@@ -60,6 +59,7 @@ void BuildTree(std::vector<std::unique_ptr<Node>>& nodes){
 void compress(const std::string& file){
 	
 	std::ifstream data_file(file, std::ios::ate);	
+	if (!data_file.is_open()) throw std::runtime_error("Cannot find or open file");
 	
 	auto file_size = data_file.tellg();
 	std::string data(file_size,'\0');
@@ -97,7 +97,7 @@ void compress(const std::string& file){
 }
 
 // for decoding 
-void uncompress(const std::string& dict, const std::string& bin){
+void decompress(const std::string& dict, const std::string& bin){
      std::ifstream dictionary(dict);
      if (!dictionary.is_open()) throw std::runtime_error("Cannot open dictionary file");
      

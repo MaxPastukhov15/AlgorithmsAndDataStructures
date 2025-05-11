@@ -1,5 +1,4 @@
 # Compiler settings
-# Compiler settings
 CXX = g++
 CXXFLAGS = -std=c++17 -g -Wall -Werror -Wpedantic 
 LDFLAGS = -lgtest -lgtest_main -lpthread
