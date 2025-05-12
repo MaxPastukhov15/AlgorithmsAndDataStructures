@@ -28,24 +28,24 @@ struct CompareNodes{
 };
 
 void BuildTree(std::vector<std::unique_ptr<Node>>& nodes){
-	std::priority_queue<Node*,std::vector<Node*>,CompareNodes> min_heap;
+	std::priority_queue<std::unique_ptr<Node>,std::vector<std::unique_ptr<Node>>,CompareNodes> min_heap;
 	for (auto& node : nodes) min_heap.push(node.get());
 	
 	while(min_heap.size() > 1){
-		Node* left = min_heap.top(); min_heap.pop();
-		Node* right = min_heap.top(); min_heap.pop();
+		std::unique_ptr<Node> left = min_heap.top(); min_heap.pop();
+		std::unique_ptr<Node> = min_heap.top(); min_heap.pop();
 		
-		Node* internal_node = std::make_unique<Node>('\0', left->probability + right->probability); 
+		std::unique_ptr<Node> internal_node = std::make_unique<Node>('\0', left->probability + right->probability); 
 		internal_node->left.reset(left);
 		internal_node->right.reset(right);
 		
-		min_heap.push(internalNode.get());
-		min_heap.push_back(std::move(internal_node));
+		min_heap.push(internal_node.get());
+		min_heap.push(std::move(internal_node));
 	}
 	
-	Node* root = min_heap.top();
+	std::unique_ptr<Node> root = min_heap.top();
 	
-	std::function<void(Node*, std::string)> generate_codes = [&](Node* node,std::string current_code){
+	std::function<void(std::unique_ptr<Node>, std::string)> generate_codes = [&](std::unique_ptr<Node> node,std::string current_code){
 		if (!node) return;
 		if (node->character != '\0') node->code = current_code;
 		
@@ -101,13 +101,13 @@ void decompress(const std::string& dict, const std::string& bin){
      std::ifstream dictionary(dict);
      if (!dictionary.is_open()) throw std::runtime_error("Cannot open dictionary file");
      
-     std::unordered_map<std::string,char> code_table;
+     std::unordered_map<std::string,std::string> code_table;
      
      std::string line;
      while (std::getline(dictionary, line)){
            auto separator = line.find(" - ");
            if ((separator == 1) && (separator != std::string::npos)){
-              std::string character = line[0];
+              std::string character = line.substr(0,1);
               std::string code = line.substr(separator+3);
               code_table[code] = character;
            }

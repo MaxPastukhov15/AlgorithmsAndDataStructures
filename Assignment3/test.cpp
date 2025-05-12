@@ -7,7 +7,7 @@ namespace fs = std::filesystem;
 
 std::string read_file(const std::string& file_name){
 	std::ifstream file(file_name);
-	if (1file.is_open()) throw std::runtime_error("Cannot open file");
+	if (file.is_open()) throw std::runtime_error("Cannot open file");
 	
 	std::string content;
 	std::string line;
