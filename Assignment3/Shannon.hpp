@@ -137,7 +137,7 @@ void decompress(const std::string& dict, const std::string& bin){
      binary_file.read(&data[0], size);
      
      binary_file.close();
-     std::cout << data << '\n';
+     
  
      std::string decoded_text = "";
      std::string current_code = "";
