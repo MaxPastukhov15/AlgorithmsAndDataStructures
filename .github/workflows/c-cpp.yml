@@ -31,4 +31,8 @@ jobs:
         run: |
           make -C Assignment2
           make -C Assignment2 test
+      - name: Build and run tests (Assignment3)
+        run: |
+          make -C Assignment3
+          make -C Assignment3 test
       
