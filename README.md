@@ -1,5 +1,5 @@
 [![C/C++ CI](https://github.com/MaxPastukhov15/AlgorithmsAndDataStructures/actions/workflows/c-cpp.yml/badge.svg)](https://github.com/MaxPastukhov15/AlgorithmsAndDataStructures/actions/workflows/c-cpp.yml)
-# Gauss solver for matrices
+# Gauss solver for matrices + Shannon-Fano encoder/decoder (text file)
 ## Author
 Pastukhov Maksim Germanovich, группа 24.Б82-мм
 ## Contacts
