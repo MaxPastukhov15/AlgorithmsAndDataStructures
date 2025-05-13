@@ -11,23 +11,24 @@ int main(){
    std::cout << "Write name of file\n";
    std::cin >> name;
    
-   compress(name);
+   try{
+   	compress("text.txt");
    
-   decompress("dictionary.txt", "compressed_text.txt");
-   
-   char ans;
-   std::cout << "delete file? y(if you want to delete)\n";
-   std::cin >> ans;
-   if (ans == "y"){
-   	fs::remove(name);
-	fs::remove("dictionary.txt");
-	fs::remove("compressed_text.txt");
-	fs::remove("decoded_text.txt");
-   }
-   else{
-	return;      
-   }
-   
+   	decompress("dictionary.txt", "compressed_text.txt");
+   	
+   	char ans;
+   	std::cout << "delete file? y/n\n";
+   	std::cin >> ans;
+   	if (ans == 'y'){
+   		fs::remove(name);
+		fs::remove("dictionary.txt");
+		fs::remove("compressed_text.txt");
+		fs::remove("decoded_text.txt");
+   	}
+  } catch (const std::exception& e){
+   	std::cerr << "Error: " << e.what() << '\n';
+   	return 1;
+  }
    return 0;
 }
 
