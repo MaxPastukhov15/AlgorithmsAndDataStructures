@@ -12,9 +12,9 @@ int main(){
    std::cin >> name;
    
    try{
-   	compress("text.txt");
+   	compress(name);
    
-   	decompress("dictionary.txt", "compressed_text.txt");
+   	decompress("dictionary.txt", "compressed_text.bin");
    	
    	char ans;
    	std::cout << "delete file? y/n\n";

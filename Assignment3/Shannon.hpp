@@ -128,19 +128,20 @@ void decompress(const std::string& dict, const std::string& bin){
      }
      dictionary.close();
      
-     std::ifstream binary_file(bin, std::ifstream::binary);
+     std::ifstream binary_file(bin, std::ios::binary);
      if (!binary_file.is_open()) throw std::runtime_error("Cannot open binary file");
      
-     auto length = binary_file.tellg();
-     std::string data(length, '\0');
-     binary_file.seekg(0);
-     binary_file.read(&data[0], length);
+     //auto length = binary_file.tellg();
+     std::string data;
+     std::getline(binary_file,data);
      binary_file.close();
-     	
+     std::cout << data << '\n';
+ 
      std::string decoded_text = "";
      std::string current_code = "";
      
      for (char bit : data){
+     
      	current_code += bit;
      	if (code_table.find(current_code) != code_table.end()){
      		decoded_text += code_table[current_code];

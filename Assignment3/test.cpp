@@ -23,13 +23,12 @@ TEST(ShannonTest, SimpleTest){
 	
 	compress("input.txt");
 	
-	std::cout << read_file("compressed_text.bin") << '\n';
-	std::cout << read_file("dictionary.txt") << '\n';
+
 	
-	decompress("dictionary.txt", "compressed_text.txt");
+	decompress("dictionary.txt", "compressed_text.bin");
 	
 	std::string decoded = read_file("decoded_text.txt");
-	std::cout << decoded << '\n';
+	
 	
 	ASSERT_EQ(decoded, "hello");
 	
@@ -45,14 +44,11 @@ TEST(ShannonTest, TextWithSpaces){
 	out.close();
 	
 	compress("input.txt");
-	decompress("dictionary.txt", "compressed_text.txt");
+	decompress("dictionary.txt", "compressed_text.bin");
 	
-	std::cout << read_file("compressed_text.bin") << '\n';
-	std::cout << read_file("dictionary.txt") << '\n';
 	
 	std::string decoded = read_file("decoded_text.txt");
 	
-	std::cout << decoded << '\n';
 	ASSERT_EQ(decoded, "hello world");
 	
 	fs::remove("input.txt");
