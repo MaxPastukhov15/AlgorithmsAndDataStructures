@@ -90,22 +90,18 @@ void compress(const std::string& file){
         if (node->character != '\0') codes[node->character] = node->code;
     }
     
-    // Собираем все биты в одну строку
-    std::string bit_string;
+     std::string bit_string;
     for(char ch : data) bit_string += codes[ch];
     
-    // Добавляем padding, чтобы длина была кратна 8
+    
     size_t padding = (8 - (bit_string.size() % 8)) % 8;
     bit_string.append(padding, '0');
-    
-    // Записываем бинарный файл
+   
     std::ofstream compressed_file("compressed_text.bin", std::ios::binary);
     
-    // Сначала записываем количество padding битов (1 байт)
     char padding_char = static_cast<char>(padding);
     compressed_file.write(&padding_char, 1);
     
-    // Затем записываем сами биты, упакованные в байты
     for(size_t i = 0; i < bit_string.size(); i += 8) {
         std::bitset<8> bits(bit_string.substr(i, 8));
         char byte = static_cast<char>(bits.to_ulong());
@@ -144,12 +140,10 @@ void decompress(const std::string& dict, const std::string& bin){
      std::ifstream binary_file(bin, std::ios::binary);
      if (!binary_file.is_open()) throw std::runtime_error("Cannot open binary file");
      
-     // Читаем количество padding битов
      char padding_char;
      binary_file.read(&padding_char, 1);
      size_t padding = static_cast<size_t>(padding_char);
      
-     // Читаем остальные данные
      std::string data;
      char byte;
      while(binary_file.read(&byte, 1)) {
@@ -157,7 +151,6 @@ void decompress(const std::string& dict, const std::string& bin){
          data += bits.to_string();
      }
      
-     // Удаляем padding биты
      if(padding > 0) {
          data.erase(data.size() - padding);
      }
