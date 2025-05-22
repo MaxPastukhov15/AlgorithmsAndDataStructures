@@ -31,7 +31,7 @@ struct CompareNodes{
         return lhs->probability > rhs->probability;
     }
 };
-
+//data structure generator for dictionary 
 void BuildTree(vshN& nodes){
     if (nodes.empty()) return;
     
@@ -64,7 +64,7 @@ void BuildTree(vshN& nodes){
     
     generate_codes(root, "");
 }
-
+//encoder
 void compress(const std::string& file){
     
     std::ifstream data_file(file, std::ios::ate);    
@@ -118,7 +118,7 @@ void compress(const std::string& file){
         
     dictionary.close();
 }
-
+//decoder
 void decompress(const std::string& dict, const std::string& bin){
      std::ifstream dictionary(dict);
      if (!dictionary.is_open()) throw std::runtime_error("Cannot open dictionary file");
