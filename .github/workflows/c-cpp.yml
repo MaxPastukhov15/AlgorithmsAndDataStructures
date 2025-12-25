@@ -12,10 +12,12 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3  
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
 
       - name: Install dependencies
-        run: sudo apt update && sudo apt install -y g++ make cmake  
+        run: sudo apt update && sudo apt install -y g++ make cmake libeigen3-dev 
 
       - name: Install Google Test
         run: |
@@ -25,7 +27,12 @@ jobs:
           cmake --build build
           sudo cmake --install build
 
-      - name: Build and run tests
+      - name: Build and run tests (Assignment2)
         run: |
-          make -C Assignment1  # Сборка
-          make -C Assignment1 test  # Запуск тестов (если есть такая цель в Makefile)
+          make -C Assignment2
+          make -C Assignment2 test
+      - name: Build and run tests (Assignment3)
+        run: |
+          make -C Assignment3
+          make -C Assignment3 test
+      

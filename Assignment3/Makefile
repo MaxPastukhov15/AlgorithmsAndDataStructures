@@ -1,11 +1,11 @@
 # Compiler settings
 CXX = g++
-CXXFLAGS = -std=c++17 -g -Wall -Werror -Wpedantic -I/usr/include/eigen3 -Iexternals/lazycsv/include
+CXXFLAGS = -std=c++17 -g -Wall -Werror -Wpedantic 
 LDFLAGS = -lgtest -lgtest_main -lpthread
 
 # Targets
-TARGET = eigen_app
-TEST_TARGET = eigen_test
+TARGET = cd_shannon
+TEST_TARGET = shannon_test
 
 # Source files
 MAIN_SRCS = main.cpp
@@ -26,7 +26,7 @@ $(TEST_TARGET): $(TEST_OBJS)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 run: $(TARGET)
-	./$(TARGET) 
+	./$(TARGET) input.csv output.csv
 
 test: $(TEST_TARGET)
 	./$(TEST_TARGET)
